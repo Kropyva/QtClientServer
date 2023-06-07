@@ -1,13 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QMessageBox>
 #include <QTcpSocket>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , validNumber(new QRegularExpressionValidator(QRegularExpression("^(-?\\d+(.\\d{2}))$"), this))
+    , validNumber(new QRegularExpressionValidator(QRegularExpression("-?\\d+(.\\d{2})"), this))
     , validAddress(new QRegularExpressionValidator(QRegularExpression("^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})$"), this))
     , validPort(new QRegularExpressionValidator(QRegularExpression("^(\\d{4})$"), this))
 {
@@ -17,20 +18,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineAddress->setValidator(validAddress);
     ui->linePort->setValidator(validPort);
 
-    ui->lineNumber->setPlaceholderText("Number");
-    ui->lineAddress->setPlaceholderText("IPv4");
-    ui->linePort->setPlaceholderText("Port");
-
-    ui->textVector->setPlaceholderText("Values");
-    ui->plainTextResult->setPlaceholderText("Result");
-
     QObject::connect(ui->buttonCalculate, &QPushButton::clicked, this, [this](){
         QTcpSocket socket {};
 
-        socket.connectToHost("localhost", 8888);
+        socket.connectToHost(ui->lineAddress->text(), ui->linePort->text().toInt());
 
-        if (!socket.waitForConnected()) {
-            qDebug() << "Failed ot connect to server: " << socket.errorString();
+        if (!socket.waitForConnected(5000)) {
+            QMessageBox::warning(nullptr, "Warning", socket.errorString());
             return;
         }
 
@@ -38,15 +32,30 @@ MainWindow::MainWindow(QWidget *parent)
         socket.write(data.toUtf8());
         socket.flush();
 
-        if (!socket.waitForReadyRead(10000)) {
-            qDebug() << "Cannot receive a response from server";
+        if (!socket.waitForReadyRead(5000)) {
+            QMessageBox::warning(nullptr, "Warning", "Cannot receive a response from the server");
             return;
         }
 
-        QByteArray response = socket.readAll();
+        QByteArray response { socket.readAll() };
         ui->plainTextResult->setPlainText(QString::fromUtf8(response));
 
         socket.close();
+    });
+
+    QObject::connect(ui->buttonPush, &QPushButton::clicked, this, [this](){
+        if (ui->lineNumber->text().size() > 0) {
+            ui->textVector->append(ui->lineNumber->text());
+            ui->lineNumber->clear();
+        }
+    });
+
+    QObject::connect(ui->buttonPop, &QPushButton::clicked, this, [this](){
+        QString text { ui->textVector->toPlainText() };
+        int lastLineIndex = text.lastIndexOf("\n");
+
+        text.chop(text.length() - lastLineIndex);
+        ui->textVector->setPlainText(text);
     });
 }
 
@@ -57,4 +66,3 @@ MainWindow::~MainWindow()
     delete validPort;
     delete ui;
 }
-
