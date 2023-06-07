@@ -38,13 +38,13 @@ MainWindow::MainWindow(QWidget *parent)
         socket.write(data.toUtf8());
         socket.flush();
 
-        if (!socket.waitForReadyRead()) {
+        if (!socket.waitForReadyRead(10000)) {
             qDebug() << "Cannot receive a response from server";
             return;
         }
 
         QByteArray response = socket.readAll();
-        qDebug() << "Response from server:" << response;
+        ui->plainTextResult->setPlainText(QString::fromUtf8(response));
 
         socket.close();
     });
