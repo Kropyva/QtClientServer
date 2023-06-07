@@ -7,22 +7,22 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , regExp(new QRegularExpression("^((\\d+(\\s?))+)$"))
+    , validNumber(new QRegularExpressionValidator(QRegularExpression("^(-?\\d+(.\\d{2}))$"), this))
+    , validAddress(new QRegularExpressionValidator(QRegularExpression("^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})$"), this))
+    , validPort(new QRegularExpressionValidator(QRegularExpression("^(\\d{4})$"), this))
 {
     ui->setupUi(this);
 
-    QObject::connect(ui->textVector, &QTextEdit::textChanged, this, [this](){
-        QString text { ui->textVector->toPlainText() };
-        QRegularExpressionMatch match { regExp->match(text)};
+    ui->lineNumber->setValidator(validNumber);
+    ui->lineAddress->setValidator(validAddress);
+    ui->linePort->setValidator(validPort);
 
-        if (!match.hasMatch()) {
-            QTextCursor cursor = ui->textVector->textCursor();
+    ui->lineNumber->setPlaceholderText("Number");
+    ui->lineAddress->setPlaceholderText("IPv4");
+    ui->linePort->setPlaceholderText("Port");
 
-            cursor.movePosition(QTextCursor::End);
-            cursor.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
-            cursor.removeSelectedText();
-        }
-    });
+    ui->textVector->setPlaceholderText("Values");
+    ui->plainTextResult->setPlaceholderText("Result");
 
     QObject::connect(ui->buttonCalculate, &QPushButton::clicked, this, [this](){
         QTcpSocket socket {};
@@ -52,7 +52,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete regExp;
+    delete validNumber;
+    delete validAddress;
+    delete validPort;
     delete ui;
 }
 

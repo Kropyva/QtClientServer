@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,6 +18,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QRegularExpression *regExp;
+    QRegularExpressionValidator *validNumber;
+    QRegularExpressionValidator *validAddress;
+    QRegularExpressionValidator *validPort;
 };
 #endif // MAINWINDOW_H
