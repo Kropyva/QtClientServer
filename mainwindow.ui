@@ -22,7 +22,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPlainTextEdit" name="plainTextVector">
+     <widget class="QTextEdit" name="textVector">
       <property name="minimumSize">
        <size>
         <width>240</width>
