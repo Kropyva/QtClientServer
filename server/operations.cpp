@@ -9,7 +9,7 @@ QVector<double> dataToNumberVector(QByteArray& message) {
     QVector<double> numbers {};
 
     std::string word {};
-    while (std::getline(stream, word, ' ')) {
+    while (std::getline(stream, word, '\n')) {
         numbers.push_back(std::stod(word));
     }
 
