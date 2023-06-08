@@ -2,6 +2,10 @@
 #include "ui_mainwindow.h"
 #include "operations.h"
 
+#include <QTcpSocket>
+#include <QMessageBox>
+#include <memory>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -15,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
         QTcpSocket *socket = std::move(server->nextPendingConnection());
 
         if (!socket->waitForReadyRead(5000)) {
+            QMessageBox::warning(nullptr, "Warning", socket->errorString());
             return;
         }
 
@@ -34,8 +39,11 @@ MainWindow::MainWindow(QWidget *parent)
         socket->write(message.toUtf8());
         socket->flush();
 
+        appendResult(">> Data sent:\n" + message);
+
         socket->deleteLater();
         socket->disconnectFromHost();
+        socket->close();
         delete socket;
 
         appendResult(">> Client disconnected");
@@ -45,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
         QString port { ui->linePort->text() };
 
         if (ui->buttonServer->text() == "Start") {
-            if (!server->listen(QHostAddress::LocalHost, port.toInt())) {
+            if (!server->listen(QHostAddress::AnyIPv4, port.toInt())) {
                 ui->plainTextResult->setPlainText(">> Server could not start!");
             } else {
                 ui->plainTextResult->setPlainText(">> Server started and listening on port " + port);

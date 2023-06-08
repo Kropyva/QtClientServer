@@ -4,8 +4,6 @@
 #include <QMainWindow>
 #include <QRegularExpressionValidator>
 #include <QTcpServer>
-#include <QTcpSocket>
-#include <memory>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,7 +23,6 @@ private:
 private:
     Ui::MainWindow *ui;
     QTcpServer *server;
-    QTcpSocket *socket;
     QRegularExpressionValidator *validPort;
 };
 
