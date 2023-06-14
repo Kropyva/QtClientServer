@@ -3,8 +3,20 @@
 
 #include <QMessageBox>
 #include <QTcpSocket>
+#include <QFile>
+#include <QTextStream>
 #include <QDebug>
 
+static void setFile(const QString& text) {
+    QString path("./numbers.txt");
+    QFile file(path);
+
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream stream(&file);
+        stream << text;
+        file.close();
+    }
+}
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -17,6 +29,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineNumber->setValidator(validNumber);
     ui->lineAddress->setValidator(validAddress);
     ui->linePort->setValidator(validPort);
+
+    QString path("./numbers.txt");
+    QFile file(path);
+
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream stream(&file);
+        ui->textVector->setText(stream.readAll());
+
+        file.close();
+    }
 
     QObject::connect(ui->buttonCalculate, &QPushButton::clicked, this, [this](){
         QTcpSocket socket {};
@@ -45,17 +67,21 @@ MainWindow::MainWindow(QWidget *parent)
 
     QObject::connect(ui->buttonPush, &QPushButton::clicked, this, [this](){
         if (ui->lineNumber->text().size() > 0) {
-            ui->textVector->append(ui->lineNumber->text());
+            QString number(ui->lineNumber->text());
+
+            ui->textVector->append(number);
+            setFile(ui->textVector->toPlainText());
             ui->lineNumber->clear();
         }
     });
 
     QObject::connect(ui->buttonPop, &QPushButton::clicked, this, [this](){
-        QString text { ui->textVector->toPlainText() };
-        int lastLineIndex = text.lastIndexOf("\n");
+        QString text(ui->textVector->toPlainText());
+        int index(text.lastIndexOf("\n"));
 
-        text.chop(text.length() - lastLineIndex);
+        text.chop(text.length() - index);
         ui->textVector->setPlainText(text);
+        setFile(text);
     });
 }
 

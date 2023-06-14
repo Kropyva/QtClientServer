@@ -1,2 +1,4 @@
+build-client-Desktop_Qt_6_2_4_MSVC2019_64bit-Debug
+build-server-Desktop_Qt_6_2_4_MSVC2019_64bit-Debug
 client/client.pro.user
 server/server.pro.user
