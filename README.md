@@ -8,7 +8,7 @@ The server, in turn, calculates the arithmetic mean and the standard deviation a
 
 To enable connection over the internet, a virtual server was created on the router, which is bound to the port of my computer's server.
 
-#Screenshots
+# Screenshots
 ![image](https://github.com/Kropyva/QtClientServer/assets/65035716/b1257afc-6bf9-49d9-b17f-b43168306316)
 ![image](https://github.com/Kropyva/QtClientServer/assets/65035716/01dd05c9-ed7d-496c-bfe2-3bac7c66b490)
 
